@@ -35,22 +35,22 @@ negate :: proc(v: ^Vec3) {
 }
 
 unit :: proc(v: Vec3) -> Vec3 {
-  return v / length(v)
+	return v / length(v)
 }
 
 Color_Formatter :: proc(fi: ^fmt.Info, arg: any, verb: rune) -> bool {
 	v := cast(^Color)arg.data
 	switch verb {
-		case 'v':
-			fmt.fmt_int(fi, u64(255.999 * v.r), false, size_of(int), 'd')
-			fmt.fmt_string(fi, " ", 's')
-			fmt.fmt_int(fi, u64(255.999 * v.g), false, size_of(int), 'd')
-			fmt.fmt_string(fi, " ", 's')
-			fmt.fmt_int(fi, u64(255.999 * v.b), false, size_of(int), 'd')
-			fmt.fmt_string(fi, "\n", 's')
-		case:
-			return false
-	}	
-	
+	case 'v':
+		fmt.fmt_int(fi, u64(255.999 * v.r), false, size_of(int), 'd')
+		fmt.fmt_string(fi, " ", 's')
+		fmt.fmt_int(fi, u64(255.999 * v.g), false, size_of(int), 'd')
+		fmt.fmt_string(fi, " ", 's')
+		fmt.fmt_int(fi, u64(255.999 * v.b), false, size_of(int), 'd')
+		fmt.fmt_string(fi, "\n", 's')
+	case:
+		return false
+	}
+
 	return true
 }

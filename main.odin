@@ -8,9 +8,10 @@ IMAGE_HEIGHT :: 256
 
 main :: proc() {
 	using types
+
 	fmt.set_user_formatters(new(map[typeid]fmt.User_Formatter))
 	fmt.register_user_formatter(type_info_of(Color).id, Color_Formatter)
-	
+
 	aspect_ratio := 16.0 / 9.0
 	image_width := 400
 
@@ -26,12 +27,7 @@ main :: proc() {
 		fmt.eprintf("\rScanlines remaining: %d ", IMAGE_HEIGHT - j)
 
 		for i in 0 ..< IMAGE_WIDTH {
-			color := Color{
-				f64(i) / (IMAGE_WIDTH - 1),
-				f64(j) / (IMAGE_HEIGHT - 1),
-				0.0,
-			}
-
+			color := Color{f64(i) / (IMAGE_WIDTH - 1), f64(j) / (IMAGE_HEIGHT - 1), 0.0}
 			fmt.print(color, flush = false)
 		}
 	}
