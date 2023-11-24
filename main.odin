@@ -14,11 +14,22 @@ main :: proc() {
 	fmt.set_user_formatters(new(map[typeid]fmt.User_Formatter))
 	fmt.register_user_formatter(typeid_of(Color), vec.Color_Formatter)
 
+	// Image
 	aspect_ratio := 16.0 / 9.0
 	image_width := 400
 
 	image_height := int(f64(image_width) / aspect_ratio)
 	image_height = 1 if image_height < 1 else image_height
+
+	// World Initialization
+
+	world := init_hit_list()
+	defer destroy_hit_list(world)
+
+	add_sphere_to_list(&world, Sphere{Point{0, 0, -1}, 0.5})
+	add_sphere_to_list(&world, Sphere{Point{0, -100.5, -1}, 100})
+
+	// Camera initialization
 
 	focal_length := 1.0
 	viewport_height := 2.0
@@ -50,7 +61,7 @@ main :: proc() {
 				direction = ray_direction,
 			}
 
-			pixel_color := ray_color(r)
+			pixel_color := ray_color(r, world)
 			fmt.print(pixel_color, "\n", flush = false)
 		}
 	}
@@ -58,24 +69,9 @@ main :: proc() {
 	fmt.eprintf("\rDone                         \n")
 }
 
-hit_sphere :: proc(center: Point, radius: f64, r: Ray) -> f64 {
-	oc := r.origin - center
-	a := vec.length_squared(r.direction)
-	half_b := vec.dot(oc, r.direction)
-	c := vec.length_squared(oc) - radius * radius
-	discriminant := half_b * half_b - a * c
-
-	if discriminant < 0 {
-		return -1
-	}
-	return (-half_b - math.sqrt(discriminant)) / a
-}
-
-ray_color :: proc(r: Ray) -> Color {
-	t := hit_sphere(Point{0, 0, -1}, 0.5, r)
-	if t > 0 {
-		n := vec.unit(ray.at(r, t) - Vec{0, 0, -1})
-		return 0.5 * Color{n.x + 1, n.y + 1, n.z + 1}
+ray_color :: proc(r: Ray, world: Hittable_List) -> Color {
+	if rec, ok := hit_list(world, r, 0, math.INF_F64); ok {
+		return 0.5 * (rec.normal + Color{1, 1, 1})
 	}
 
 	unit_direction := vec.unit(r.direction)
