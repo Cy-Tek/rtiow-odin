@@ -7,7 +7,7 @@ Vec3 :: distinct [3]f64
 Point :: Vec3
 Color :: Vec3
 
-length :: proc(v: Vec3) -> f64 {
+vec_length :: proc(v: Vec3) -> f64 {
 	return math.sqrt(vec_length_squared(v))
 }
 
@@ -33,7 +33,7 @@ negate :: proc(v: ^Vec3) {
 }
 
 unit :: proc(v: Vec3) -> Vec3 {
-	return v / length(v)
+	return v / vec_length(v)
 }
 
 Color_Formatter :: proc(fi: ^fmt.Info, arg: any, verb: rune) -> bool {

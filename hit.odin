@@ -7,7 +7,7 @@ Hit_Record :: struct {
 	front_face: bool,
 }
 
-set_face_normal :: proc(record: ^Hit_Record, r: Ray, outward_normal: Vec3) {
+hit_rec_set_face_normal :: proc(record: ^Hit_Record, r: Ray, outward_normal: Vec3) {
 	record.front_face = dot(r.direction, outward_normal) < 0
 	record.normal = record.front_face ? outward_normal : -outward_normal
 }
@@ -25,7 +25,7 @@ destroy_hit_list :: proc(list: Hittable_List) {
 	delete(list.spheres)
 }
 
-hittable_list_clear :: proc(list: ^Hittable_List) {
+clear_hit_list :: proc(list: ^Hittable_List) {
 	clear(&list.spheres)
 }
 

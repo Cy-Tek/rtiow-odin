@@ -34,7 +34,7 @@ hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_tmin, ray_tmax: f64) -> (Hi
 	rec.point = ray_at(r, rec.t)
 
 	outward_normal := (rec.point - center) / radius
-	set_face_normal(&rec, r, outward_normal)
+	hit_rec_set_face_normal(&rec, r, outward_normal)
 
 	return rec, true
 }
