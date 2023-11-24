@@ -1,16 +1,14 @@
 package main
 
-import "types/vec"
-
 Hit_Record :: struct {
 	point:      Point,
-	normal:     Vec,
+	normal:     Vec3,
 	t:          f64,
 	front_face: bool,
 }
 
-set_face_normal :: proc(record: ^Hit_Record, r: Ray, outward_normal: Vec) {
-	record.front_face = vec.dot(r.direction, outward_normal) < 0
+set_face_normal :: proc(record: ^Hit_Record, r: Ray, outward_normal: Vec3) {
+	record.front_face = dot(r.direction, outward_normal) < 0
 	record.normal = record.front_face ? outward_normal : -outward_normal
 }
 

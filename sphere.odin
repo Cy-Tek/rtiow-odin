@@ -1,8 +1,6 @@
 package main
 
 import "core:math"
-import "types/ray"
-import "types/vec"
 
 Sphere :: struct {
 	center: Point,
@@ -11,9 +9,9 @@ Sphere :: struct {
 
 hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_tmin, ray_tmax: f64) -> (Hit_Record, bool) {
 	oc := r.origin - center
-	a := vec.length_squared(r.direction)
-	half_b := vec.dot(oc, r.direction)
-	c := vec.length_squared(oc) - radius * radius
+	a := vec_length_squared(r.direction)
+	half_b := dot(oc, r.direction)
+	c := vec_length_squared(oc) - radius * radius
 	discriminant := half_b * half_b - a * c
 
 	if discriminant < 0 {
@@ -33,7 +31,7 @@ hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_tmin, ray_tmax: f64) -> (Hi
 	rec := Hit_Record {
 		t = root,
 	}
-	rec.point = ray.at(r, rec.t)
+	rec.point = ray_at(r, rec.t)
 
 	outward_normal := (rec.point - center) / radius
 	set_face_normal(&rec, r, outward_normal)

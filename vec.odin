@@ -1,4 +1,4 @@
-package vec
+package main
 
 import "core:fmt"
 import "core:math"
@@ -8,10 +8,10 @@ Point :: Vec3
 Color :: Vec3
 
 length :: proc(v: Vec3) -> f64 {
-	return math.sqrt(length_squared(v))
+	return math.sqrt(vec_length_squared(v))
 }
 
-length_squared :: proc(v: Vec3) -> f64 {
+vec_length_squared :: proc(v: Vec3) -> f64 {
 	squared := v * v
 	return squared.x + squared.y + squared.z
 }
