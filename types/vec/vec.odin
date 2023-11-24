@@ -1,4 +1,4 @@
-package types
+package vec
 
 import "core:fmt"
 import "core:math"
@@ -13,7 +13,7 @@ length :: proc(v: Vec3) -> f64 {
 
 length_squared :: proc(v: Vec3) -> f64 {
 	squared := v * v
-	return v.x + v.y + v.z
+	return squared.x + squared.y + squared.z
 }
 
 dot :: proc(v, u: Vec3) -> f64 {
@@ -21,13 +21,11 @@ dot :: proc(v, u: Vec3) -> f64 {
 	return result.x + result.y + result.z
 }
 
-cross :: proc(v, u: Vec3) -> Vec3 {
-	result: Vec3
-	result.x = u.y * v.z - u.z * v.y
-	result.y = u.z * v.x - u.x * v.z
-	result.z = u.x * v.y - u.y * v.x
-
-	return result
+cross :: proc(v, u: Vec3) -> (res: Vec3) {
+	res.x = u.y * v.z - u.z * v.y
+	res.y = u.z * v.x - u.x * v.z
+	res.z = u.x * v.y - u.y * v.x
+	return
 }
 
 negate :: proc(v: ^Vec3) {
@@ -47,7 +45,6 @@ Color_Formatter :: proc(fi: ^fmt.Info, arg: any, verb: rune) -> bool {
 		fmt.fmt_int(fi, u64(255.999 * v.g), false, size_of(int), 'd')
 		fmt.fmt_string(fi, " ", 's')
 		fmt.fmt_int(fi, u64(255.999 * v.b), false, size_of(int), 'd')
-		fmt.fmt_string(fi, "\n", 's')
 	case:
 		return false
 	}
