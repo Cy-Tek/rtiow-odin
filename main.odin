@@ -7,7 +7,6 @@ main :: proc() {
 	fmt.register_user_formatter(typeid_of(Color), Color_Formatter)
 
 	// World Initialization
-
 	world := init_hit_list()
 	defer destroy_hit_list(world)
 
