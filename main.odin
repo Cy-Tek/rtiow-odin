@@ -1,10 +1,16 @@
 package main
 
 import "core:fmt"
+import "core:math/rand"
+import "core:time"
+
+@(thread_local)
+rng: rand.Rand
 
 main :: proc() {
-	fmt.set_user_formatters(new(map[typeid]fmt.User_Formatter))
-	fmt.register_user_formatter(typeid_of(Color), Color_Formatter)
+
+	// Init random number generator
+	rand.init(&rng, u64(time.now()._nsec))
 
 	// World Initialization
 	world := init_hit_list()
@@ -15,7 +21,7 @@ main :: proc() {
 
 	// Camera initialization
 	camera := Camera{}
-	init_camera(&camera, 16.0 / 9.0, 400)
+	init_camera(&camera, 16.0 / 9.0, 400, 100)
 
 	// Run the raytracer
 	render_camera(camera, world)

@@ -2,17 +2,26 @@ package main
 
 import "core:fmt"
 import "core:math"
+import "core:math/rand"
 
 Camera :: struct {
 	aspect_ratio:                 f64,
 	image_width, image_height:    int,
 	center, pixel00_loc:          Point,
 	pixel_delta_u, pixel_delta_v: Vec3,
+	samples_per_pixel:            uint,
 }
 
-init_camera :: proc(using camera: ^Camera, new_aspect_ratio: f64, new_image_width: int) {
-	aspect_ratio = aspect_ratio
-	image_width = image_width
+init_camera :: proc(
+	using camera: ^Camera,
+	new_aspect_ratio: f64,
+	new_image_width: int,
+	samples: uint,
+) {
+	aspect_ratio = new_aspect_ratio
+	image_width = new_image_width
+	samples_per_pixel = samples
+
 
 	if height := int(f64(image_width) / aspect_ratio); height >= 1 {
 		image_height = height
@@ -42,22 +51,45 @@ init_camera :: proc(using camera: ^Camera, new_aspect_ratio: f64, new_image_widt
 render_camera :: proc(using camera: Camera, world: Hittable_List) {
 	fmt.printf("P3\n%d %d\n255\n", image_width, image_height, flush = false)
 
+	pixel_color: Color
+	r: Ray
+
 	for j in 0 ..< image_height {
 		fmt.eprintf("\rScanlines remaining: %d ", image_height - j)
 		for i in 0 ..< image_width {
-			pixel_center := pixel00_loc + (f64(i) * pixel_delta_u) + (f64(j) * pixel_delta_v)
-			ray_direction := pixel_center - center
-			r := Ray {
-				origin    = center,
-				direction = ray_direction,
+			pixel_color = Color{0, 0, 0}
+			for sample in 0 ..< samples_per_pixel {
+				r := get_ray(camera, i, j)
+				pixel_color += ray_color(r, world)
 			}
 
-			pixel_color := ray_color(r, world)
-			fmt.print(pixel_color, "\n", flush = false)
+			pixel_color *= 1 / f64(samples_per_pixel)
+			intensity := Interval{0, 0.999}
+			clamped := clamp_vec(pixel_color, intensity)
+			clamped *= 255
+
+			fmt.printf("%.0f %.0f %.0f\n", clamped.r, clamped.g, clamped.b)
 		}
 	}
 
 	fmt.eprintf("\rDone                         \n")
+}
+
+get_ray :: proc(using camera: Camera, i, j: int) -> Ray {
+	// Get a randomly sampled camera ray for the pixel at location i, j.
+	pixel_center := pixel00_loc + (f64(i) * pixel_delta_u) + (f64(j) * pixel_delta_v)
+	pixel_sample := pixel_center + pixel_sample_square(pixel_delta_u, pixel_delta_v)
+
+	ray_origin := center
+	ray_direction := pixel_sample - ray_origin
+
+	return Ray{ray_origin, ray_direction}
+}
+
+pixel_sample_square :: proc(delta_u, delta_y: Vec3) -> Vec3 {
+	px := -0.5 + rand.float64(&rng)
+	py := -0.5 + rand.float64(&rng)
+	return px * delta_u + py * delta_y
 }
 
 ray_color :: proc(r: Ray, world: Hittable_List) -> Color {

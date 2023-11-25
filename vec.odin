@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import "core:math"
+import "core:strings"
 
 Vec3 :: distinct [3]f64
 Point :: Vec3
@@ -14,6 +15,16 @@ vec_length :: proc(v: Vec3) -> f64 {
 vec_length_squared :: proc(v: Vec3) -> f64 {
 	squared := v * v
 	return squared.x + squared.y + squared.z
+}
+
+clamp_vec :: proc(v: Vec3, interval: Interval) -> Vec3 {
+	return(
+		Vec3 {
+			clamp_interval(interval, v.x),
+			clamp_interval(interval, v.y),
+			clamp_interval(interval, v.z),
+		}
+	)
 }
 
 dot :: proc(v, u: Vec3) -> f64 {
@@ -34,20 +45,4 @@ negate :: proc(v: ^Vec3) {
 
 unit :: proc(v: Vec3) -> Vec3 {
 	return v / vec_length(v)
-}
-
-Color_Formatter :: proc(fi: ^fmt.Info, arg: any, verb: rune) -> bool {
-	v := cast(^Color)arg.data
-	switch verb {
-	case 'v':
-		fmt.fmt_int(fi, u64(255.999 * v.r), false, size_of(int), 'd')
-		fmt.fmt_string(fi, " ", 's')
-		fmt.fmt_int(fi, u64(255.999 * v.g), false, size_of(int), 'd')
-		fmt.fmt_string(fi, " ", 's')
-		fmt.fmt_int(fi, u64(255.999 * v.b), false, size_of(int), 'd')
-	case:
-		return false
-	}
-
-	return true
 }

@@ -1,5 +1,6 @@
 /main
 /rtiow-odin
+/rtiow-odin.dSYM
 /**/*.ppm
 
 ols.json
