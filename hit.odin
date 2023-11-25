@@ -36,16 +36,16 @@ add_sphere_to_list :: proc(list: ^Hittable_List, sphere: Sphere) {
 hit_list :: proc(
 	list: Hittable_List,
 	r: Ray,
-	ray_tmin, ray_tmax: f64,
+	ray_t: Interval,
 ) -> (
 	out_rec: Hit_Record,
 	found_hit: bool,
 ) {
 	found_hit = false
-	closest_so_far := ray_tmax
+	closest_so_far := ray_t.max
 
 	for sphere in list.spheres {
-		if rec, hit := hit_sphere(sphere, r, ray_tmin, closest_so_far); hit {
+		if rec, hit := hit_sphere(sphere, r, Interval{ray_t.min, closest_so_far}); hit {
 			found_hit = true
 			closest_so_far = rec.t
 			out_rec = rec

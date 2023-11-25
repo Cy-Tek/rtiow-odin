@@ -7,7 +7,7 @@ Sphere :: struct {
 	radius: f64,
 }
 
-hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_tmin, ray_tmax: f64) -> (Hit_Record, bool) {
+hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_t: Interval) -> (Hit_Record, bool) {
 	oc := r.origin - center
 	a := vec_length_squared(r.direction)
 	half_b := dot(oc, r.direction)
@@ -21,9 +21,9 @@ hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_tmin, ray_tmax: f64) -> (Hi
 
 	// Find the nearest root that lies in the acceptable range
 	root := (-half_b - sqrtd) / a
-	if root <= ray_tmin || ray_tmax <= root {
+	if !interval_surrounds(ray_t, root) {
 		root = (-half_b + sqrtd) / a
-		if (root <= ray_tmin || ray_tmax <= root) {
+		if !interval_surrounds(ray_t, root) {
 			return Hit_Record{}, false
 		}
 	}
