@@ -48,8 +48,7 @@ random_vec_on_hemisphere :: proc(normal: Vec3) -> Vec3 {
 		return on_unit_sphere
 	}
 	
-	negate_vec(&on_unit_sphere)
-	return on_unit_sphere
+	return negate_vec(on_unit_sphere)
 }
 
 vec_length :: proc(v: Vec3) -> f64 {
@@ -68,6 +67,13 @@ vec_near_zero :: proc(v: Vec3) -> bool {
 
 reflect_vec :: proc(v: Vec3, normal: Vec3) -> Vec3 {
 	return v - 2 * dot(v, normal) * normal
+}
+
+refract_vec :: proc(uv: Vec3, normal: Vec3, etai_over_etat: f64) -> Vec3 {
+	cos_theta: f64 = min(dot(negate_vec(uv), normal), 1.0)
+	r_out_perp := etai_over_etat * (uv + cos_theta * normal)
+	r_out_parallel: Vec3 = -math.sqrt(abs(1.0 - vec_length_squared(r_out_perp))) * normal
+	return r_out_perp + r_out_parallel
 }
 
 clamp_vec :: proc(v: Vec3, interval: Interval) -> Vec3 {
@@ -92,8 +98,8 @@ cross :: proc(v, u: Vec3) -> (res: Vec3) {
 	return
 }
 
-negate_vec :: proc(v: ^Vec3) {
-	v^ *= -1
+negate_vec :: proc(v: Vec3) -> Vec3 {
+	return v * -1
 }
 
 unit :: proc(v: Vec3) -> Vec3 {
