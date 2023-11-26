@@ -10,6 +10,7 @@ Camera :: struct {
 	center, pixel00_loc:          Point,
 	pixel_delta_u, pixel_delta_v: Vec3,
 	samples_per_pixel, max_depth: uint,
+	vfov:                         f64,
 }
 
 init_camera :: proc(
@@ -18,11 +19,13 @@ init_camera :: proc(
 	image_width: int,
 	samples_per_pixel: uint = 100,
 	max_depth: uint = 10,
+	fov: f64 = 90,
 ) {
 	cam.aspect_ratio = aspect_ratio
 	cam.image_width = image_width
 	cam.samples_per_pixel = samples_per_pixel
 	cam.max_depth = max_depth
+	cam.vfov = fov
 
 	if height := int(f64(image_width) / aspect_ratio); height >= 1 {
 		cam.image_height = height
@@ -32,7 +35,9 @@ init_camera :: proc(
 
 	// Determine viewport dimensions
 	focal_length := 1.0
-	viewport_height := 2.0
+	theta: f64 = math.to_radians(cam.vfov)
+	h: f64 = math.tan(theta / 2)
+	viewport_height := 2 * h * focal_length
 	viewport_width := viewport_height * f64(cam.image_width) / f64(cam.image_height)
 
 	// Calculate the vectors across the horizontal and down the vertical viewport edges.
