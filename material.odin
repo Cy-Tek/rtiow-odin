@@ -19,15 +19,16 @@ scatter :: proc(
 		return scatter_metal(m, r_in, rec)
 	case Lambertian:
 		return scatter_lambertian(m, r_in, rec)
+	case:
+		return
 	}
-
-	return
 }
 
 // Metal material
 
 Metal :: struct {
 	albedo: Color,
+	fuzz:   f64,
 }
 
 scatter_metal :: proc(
@@ -40,9 +41,9 @@ scatter_metal :: proc(
 	bounced: bool,
 ) {
 	reflected := reflect_vec(unit(r_in.direction), rec.normal)
-	scattered = Ray{rec.point, reflected}
+	scattered = Ray{rec.point, reflected + m.fuzz * random_unit_vec()}
 	attenuation = m.albedo
-	bounced = true
+	bounced = dot(scattered.direction, rec.normal) > 0
 	return
 }
 

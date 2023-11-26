@@ -18,14 +18,20 @@ main :: proc() {
 	defer destroy_hit_list(world)
 
 	material_ground: Material = Lambertian{Color{0.8, 0.8, 0.0}}
-	material_center: Material = Lambertian{Color{0.7, 0.3, 03}}
-	material_left: Material = Metal{Color{0.8, 0.8, 0.8}}
-	material_right: Material = Metal{Color{0.8, 0.6, 0.2}}
+	material_center: Material = Lambertian{Color{0.7, 0.3, 0.3}}
+	material_left: Material = Metal{Color{0.8, 0.8, 0.8}, 0.3}
+	material_right: Material = Metal{Color{0.8, 0.6, 0.2}, 1.0}
 
-	add_sphere_to_list(&world, Sphere{Point{0, -100.5, -1}, 100, material_ground})
-	add_sphere_to_list(&world, Sphere{Point{0, 0, -1}, 0.5, material_center})
-	add_sphere_to_list(&world, Sphere{Point{-1, 0, -1}, 0.5, material_left})
-	add_sphere_to_list(&world, Sphere{Point{1, 0, -1}, 0.5, material_right})
+	spheres := [?]Sphere {
+		Sphere{Point{0, -100.5, -1}, 100, material_ground},
+		Sphere{Point{0, 0, -1}, 0.5, material_center},
+		Sphere{Point{-1, 0, -1}, 0.5, material_left},
+		Sphere{Point{1, 0, -1}, 0.5, material_right},
+	}
+
+	for sphere in spheres {
+		add_sphere_to_list(&world, sphere)
+	}
 
 	// Camera initialization
 	camera := Camera{}
