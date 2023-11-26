@@ -5,6 +5,7 @@ import "core:math"
 Sphere :: struct {
 	center: Point,
 	radius: f64,
+	mat:    Material,
 }
 
 hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_t: Interval) -> (Hit_Record, bool) {
@@ -30,6 +31,7 @@ hit_sphere :: proc(using sphere: Sphere, r: Ray, ray_t: Interval) -> (Hit_Record
 
 	rec := Hit_Record {
 		t = root,
+		mat = mat
 	}
 	rec.point = ray_at(r, rec.t)
 

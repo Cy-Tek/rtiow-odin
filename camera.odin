@@ -9,43 +9,44 @@ Camera :: struct {
 	image_width, image_height:    int,
 	center, pixel00_loc:          Point,
 	pixel_delta_u, pixel_delta_v: Vec3,
-	samples_per_pixel:            uint,
+	samples_per_pixel, max_depth: uint,
 }
 
 init_camera :: proc(
-	using camera: ^Camera,
-	new_aspect_ratio: f64,
-	new_image_width: int,
-	samples: uint,
+	cam: ^Camera,
+	aspect_ratio: f64,
+	image_width: int,
+	samples_per_pixel: uint = 100,
+	max_depth: uint = 10,
 ) {
-	aspect_ratio = new_aspect_ratio
-	image_width = new_image_width
-	samples_per_pixel = samples
-
+	cam.aspect_ratio = aspect_ratio
+	cam.image_width = image_width
+	cam.samples_per_pixel = samples_per_pixel
+	cam.max_depth = max_depth
 
 	if height := int(f64(image_width) / aspect_ratio); height >= 1 {
-		image_height = height
+		cam.image_height = height
 	} else {
-		image_height = 1
+		cam.image_height = 1
 	}
 
 	// Determine viewport dimensions
 	focal_length := 1.0
 	viewport_height := 2.0
-	viewport_width := viewport_height * f64(image_width) / f64(image_height)
+	viewport_width := viewport_height * f64(cam.image_width) / f64(cam.image_height)
 
 	// Calculate the vectors across the horizontal and down the vertical viewport edges.
 	viewport_u := Vec3{viewport_width, 0, 0}
 	viewport_v := Vec3{0, -viewport_height, 0}
 
 	// Calculate the horizontal and vertical delta vectors from pixel to pixel
-	pixel_delta_u = viewport_u / f64(image_width)
-	pixel_delta_v = viewport_v / f64(image_height)
+	cam.pixel_delta_u = viewport_u / f64(cam.image_width)
+	cam.pixel_delta_v = viewport_v / f64(cam.image_height)
 
 
 	// Calculate the location of the upper left pixel
-	viewport_upper_left := center - Vec3{0, 0, focal_length} - viewport_u / 2 - viewport_v / 2
-	pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v)
+	viewport_upper_left := cam.center - Vec3{0, 0, focal_length} - viewport_u / 2 - viewport_v / 2
+	cam.pixel00_loc = viewport_upper_left + 0.5 * (cam.pixel_delta_u + cam.pixel_delta_v)
 }
 
 render_camera :: proc(using camera: Camera, world: Hittable_List) {
@@ -60,10 +61,14 @@ render_camera :: proc(using camera: Camera, world: Hittable_List) {
 			pixel_color = Color{0, 0, 0}
 			for sample in 0 ..< samples_per_pixel {
 				r := get_ray(camera, i, j)
-				pixel_color += ray_color(r, world)
+				pixel_color += ray_color(r, max_depth, world)
 			}
 
 			pixel_color *= 1 / f64(samples_per_pixel)
+			pixel_color.r = linear_to_gamma(pixel_color.r)
+			pixel_color.g = linear_to_gamma(pixel_color.g)
+			pixel_color.b = linear_to_gamma(pixel_color.b)
+
 			intensity := Interval{0, 0.999}
 			clamped := clamp_vec(pixel_color, intensity)
 			clamped *= 255
@@ -92,9 +97,16 @@ pixel_sample_square :: proc(delta_u, delta_y: Vec3) -> Vec3 {
 	return px * delta_u + py * delta_y
 }
 
-ray_color :: proc(r: Ray, world: Hittable_List) -> Color {
-	if rec, ok := hit_list(world, r, Interval{0, math.INF_F64}); ok {
-		return 0.5 * (rec.normal + Color{1, 1, 1})
+ray_color :: proc(r: Ray, depth: uint, world: Hittable_List) -> Color {
+	if depth <= 0 {
+		return Color{}
+	}
+
+	if rec, ok := hit_list(world, r, Interval{0.001, math.INF_F64}); ok {
+		if attenuation, scattered, bounced := scatter(rec.mat, r, rec); bounced {
+			return attenuation * ray_color(scattered, depth - 1, world)
+		}
+		return Color{}
 	}
 
 	unit_direction := unit(r.direction)

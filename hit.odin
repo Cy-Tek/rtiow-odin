@@ -4,6 +4,7 @@ Hit_Record :: struct {
 	point:      Point,
 	normal:     Vec3,
 	t:          f64,
+	mat:        Material,
 	front_face: bool,
 }
 
