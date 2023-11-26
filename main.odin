@@ -7,11 +7,12 @@ import "core:time"
 @(thread_local)
 rng: rand.Rand
 
-main :: proc() {
-
-	// Init random number generator
+@(init)
+init_rand :: proc() {
 	rand.init(&rng, u64(time.now()._nsec))
+}
 
+main :: proc() {
 	// World Initialization
 	world := init_hit_list()
 	defer destroy_hit_list(world)
