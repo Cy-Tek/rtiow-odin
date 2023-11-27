@@ -62,8 +62,8 @@ main :: proc() {
 	init_camera(
 		&camera,
 		aspect_ratio = 16.0 / 9.0,
-		image_width = 1920,
-		samples_per_pixel = 500,
+		image_width = 800,
+		samples_per_pixel = 300,
 		max_depth = 50,
 		fov = 20,
 		look_from = Point{13, 2, 3},

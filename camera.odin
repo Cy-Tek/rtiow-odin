@@ -111,7 +111,7 @@ render_camera :: proc(using camera: Camera, world: Hittable_List) {
 	fmt.eprintf("\rDone                         \n")
 }
 
-get_ray :: proc(using camera: Camera, i, j: int) -> Ray {
+get_ray :: #force_inline proc(using camera: Camera, i, j: int) -> Ray {
 	// Get a randomly sampled camera ray for the pixel at location i, j.
 	pixel_center := pixel00_loc + (f64(i) * pixel_delta_u) + (f64(j) * pixel_delta_v)
 	pixel_sample := pixel_center + pixel_sample_square(pixel_delta_u, pixel_delta_v)
@@ -122,12 +122,12 @@ get_ray :: proc(using camera: Camera, i, j: int) -> Ray {
 	return Ray{ray_origin, ray_direction}
 }
 
-defocus_disk_sample :: proc(using camera: Camera) -> Vec3 {
+defocus_disk_sample :: #force_inline proc(using camera: Camera) -> Vec3 {
 	p := random_vec_in_unit_disk()
 	return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v)
 }
 
-pixel_sample_square :: proc(delta_u, delta_y: Vec3) -> Vec3 {
+pixel_sample_square :: #force_inline proc(delta_u, delta_y: Vec3) -> Vec3 {
 	px := -0.5 + rand.float64(&rng)
 	py := -0.5 + rand.float64(&rng)
 	return px * delta_u + py * delta_y
