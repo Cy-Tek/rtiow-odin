@@ -38,6 +38,15 @@ random_vec_in_unit_sphere :: proc() -> Vec3 {
 	}
 }
 
+random_vec_in_unit_disk :: proc() -> Vec3 {
+	for {
+		p := Vec3{rand.float64_range(-1, 1), rand.float64_range(-1, 1), 0}
+		if vec_length_squared(p) < 1 {
+			return p
+		}
+	}
+}
+
 random_unit_vec :: proc() -> Vec3 {
 	return unit(random_vec_in_unit_sphere())
 }
